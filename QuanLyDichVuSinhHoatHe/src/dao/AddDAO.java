@@ -286,41 +286,17 @@ public class AddDAO {
 
 	public void themTreEm(Scanner sc) {
 		String hoTenTre = check.nhapHoTenTre(sc);
-		java.sql.Date NgaySinh = null;
-		boolean ns = true;
-		while (ns) {
-			try {
-				System.out.println("Nhập vào ngày sinh của trẻ (YYYY-MM-DD)");
-				String NgaySinhStr = sc.nextLine();
-				NgaySinh = java.sql.Date.valueOf(NgaySinhStr);
-				// kiểm tra tuổi
-				LocalDate ngaySinhLocalDate = NgaySinh.toLocalDate(); // chuyển đối tượng java.sql.date sang local date
-																		// để so sánh với ngày hiện tại
-				LocalDate ngayHienTai = LocalDate.now();
-				int tuoi = Period.between(ngaySinhLocalDate, ngayHienTai).getYears(); // phương thức period.between:tính
-																						// toán khoảng thời gian giữa 2
-																						// đối tượng
-																						// giữa 2 đối tượng, .getYears
-																						// để lấy năm tính tuổi
-				if (tuoi <= 5 || tuoi >= 15) {
-					System.out.println("Tuổi của trẻ không hợp lệ, phải lớn hơn 5 và nhỏ hơn 15");
-					continue;
-				}
-				ns = false;
-			} catch (Exception e) {
-				System.out.println("Ngày tháng năm không hợp lệ, vui lòng nhập lại");
-			}
-		}
+		java.sql.Date ngaySinh = check.nhapNgaySinh(sc);
 		String gioiTinh = check.nhapGioiTinh(sc);
 		int maPH = check.nhapMaPH(sc);
-		TreEmThao te = new TreEmThao(hoTenTre, NgaySinh, gioiTinh, maPH);
+		TreEmThao te = new TreEmThao(hoTenTre, ngaySinh, gioiTinh, maPH);
 		dste.add(te);
 		try {
 			Connection con = ketNoi.getConnection();
 			String sql = "INSERT INTO TREEM (HoTenTre, NgaySinh, GioiTinh, MaPH) " + " VALUES (?, ?, ?, ?)";
 			PreparedStatement pst = con.prepareStatement(sql);
 			pst.setString(1, hoTenTre);
-			pst.setDate(2, new java.sql.Date(NgaySinh.getTime()));
+			pst.setDate(2, new java.sql.Date(ngaySinh.getTime()));
 			pst.setString(3, gioiTinh);
 			pst.setInt(4, maPH);
 			pst.executeUpdate();

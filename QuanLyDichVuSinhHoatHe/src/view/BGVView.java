@@ -92,7 +92,7 @@ public class BGVView {
 			while (!sc.hasNextInt()) {
 				System.out.println("Nhập vào một số từ 1 đến 5");
 			}
-			int luaChon = Integer.parseInt(sc.nextLine());
+			int luaChon = check.nhapLuaChon(sc);
 			switch (luaChon) {
 			case 1:
 				addDAO.themTreEm(sc);

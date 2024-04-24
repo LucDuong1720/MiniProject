@@ -350,32 +350,7 @@ public class EditDAO {
 			}
 			System.out.println("Nhập vào họ tên của trẻ");
 			String tenSua = check.nhapHoTenTre(sc);
-			java.sql.Date ngaySinhSua = null;
-			boolean ns = true;
-			while (ns) {
-				try {
-					System.out.println("Nhập vào ngày sinh của trẻ (YYYY-MM-DD)");
-					String NgaySinhSuaStr = sc.nextLine();
-					ngaySinhSua = java.sql.Date.valueOf(NgaySinhSuaStr);
-					LocalDate ngaySinhLocalDate = ngaySinhSua.toLocalDate(); // chuyển đối tượng java.sql.date sang
-																				// local date để so sánh với ngày hiện
-																				// tại
-					LocalDate ngayHienTai = LocalDate.now();
-					int tuoi = Period.between(ngaySinhLocalDate, ngayHienTai).getYears(); // phương thức period.between:
-																							// tính toán khoảng thời
-																							// gian giữa 2 đối tượng,
-																							// .getYears để lấy năm tính
-																							// tuổi
-					if (tuoi <= 5 || tuoi >= 15) {
-						System.out.println("Tuổi của trẻ không hợp lệ, phải lớn hơn 5 và nhỏ hơn 15");
-						continue;
-					}
-					ns = false;
-				} catch (Exception e) {
-					System.out.println("Ngày tháng năm không hợp lệ, vui lòng nhập lại");
-				}
-			}
-			
+			java.sql.Date ngaySinhSua = check.nhapNgaySinh(sc);
 			String gioiTinhSua = check.nhapGioiTinh(sc);
 			int maPHSua = check.nhapMaPH(sc);
 			String sql = "UPDATE TREEM SET HoTenTre = ?, NgaySinh = ?, GioiTinh = ?, MaPH = ? WHERE MaTre = ?";

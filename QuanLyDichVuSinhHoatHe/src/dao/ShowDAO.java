@@ -321,11 +321,12 @@ public class ShowDAO {
 			PreparedStatement pst = con.prepareStatement(sql);
 			ResultSet rs = pst.executeQuery();
 			System.out.println("Thông tin các giáo viên dạy nhiều lớp học nhất trong khoảng thời gian 1/2024 - 2/2024");
-			System.out.printf("%-10s %-20s\n", "Mã Giáo Viên", "Tên Giáo Viên");
+			System.out.printf("%-20s %-30s %-10s\n", "Mã Giáo Viên", "Tên Giáo Viên", "Số Lượng Lớp");
 			while (rs.next()) {
 				int MaGV = rs.getInt("MaGV");
 				String HoTenGV = rs.getString("HoTenGV");
-				System.out.printf("%-10d %-20s \n", MaGV, HoTenGV);
+				int soLuongLop = rs.getInt("SoLuongLop");
+				System.out.printf("%-20d %-30s %-10d\n", MaGV, HoTenGV, soLuongLop);
 			}
 			ketNoi.closeConnection(con);
 		} catch (SQLException e) {

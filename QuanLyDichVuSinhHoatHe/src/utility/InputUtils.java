@@ -1,11 +1,13 @@
 package utility;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -263,4 +265,52 @@ public class InputUtils {
 		ResultSet rs = pst.executeQuery();
 		return rs.next();
 	}
+	
+	public Date nhapNgaySinh (Scanner sc) {
+        java.sql.Date ngaySinhSua = null;
+        boolean ns = true;
+        while (ns) {
+            try {
+                System.out.println("Nhập vào ngày sinh của trẻ (YYYY-MM-DD)");
+                String NgaySinhSuaStr = sc.nextLine();
+                ngaySinhSua = java.sql.Date.valueOf(NgaySinhSuaStr);
+                LocalDate ngaySinhLocalDate = ngaySinhSua.toLocalDate(); // chuyển đối tượng java.sql.date sang
+                                                                            // local date để so sánh với ngày hiện
+                                                                            // tại
+                LocalDate ngayHienTai = LocalDate.now();
+                int tuoi = Period.between(ngaySinhLocalDate, ngayHienTai).getYears(); // phương thức period.between:
+                                                                                        // tính toán khoảng thời
+                                                                                        // gian giữa 2 đối tượng,
+                                                                                        // .getYears để lấy năm tính
+                                                                                        // tuổi
+                if (tuoi <= 5 || tuoi >= 15) {
+                    System.out.println("Tuổi của trẻ không hợp lệ, phải lớn hơn 5 và nhỏ hơn 15");
+                    continue;
+                }
+                ns = false;
+            } catch (Exception e) {
+                System.out.println("Ngày tháng năm không hợp lệ, vui lòng nhập lại");
+            }
+        }    
+        return ngaySinhSua;
+    }
+	
+	public int nhapLuaChon (Scanner sc) {
+        int luaChon = 0;
+        boolean ct1 = true;
+        while (ct1) {
+            try {
+                System.out.println("nhập vào lựa chọn");
+                luaChon = Integer.parseInt(sc.nextLine());
+                if (luaChon < 0 || luaChon > 6) {
+                    System.out.println("Lựa chọn chưa được thiết lập vui lòng chọn lại ");
+                } else {
+                    ct1 = false;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(" Lựa chọn không hợp lệ vui lòng nhập lại");
+            }
+        }
+        return luaChon;
+    }
 }
