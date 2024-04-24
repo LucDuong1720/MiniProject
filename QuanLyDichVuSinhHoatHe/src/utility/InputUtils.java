@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import connectDB.ConnectDB;
+import connectDB.ketNoi;
 
 public class InputUtils {
     private static final Scanner scanner = new Scanner(System.in);
@@ -203,5 +204,63 @@ public class InputUtils {
 
         return exists;
     }
+	public String nhapHoTenTre (Scanner sc) {
+		System.out.println("Nhập vào họ tên của trẻ");
+		String hoTenTre = sc.nextLine();
+		while (hoTenTre.trim().isEmpty() || !hoTenTre.matches("[\\p{L}\\s]+")) {
+			System.out.println("Họ tên không hợp lệ, vui lòng nhập lại");
+			hoTenTre = sc.nextLine();
+		}
+		return hoTenTre;
+	}
 
+	public String nhapGioiTinh (Scanner sc) {
+		System.out.println("Nhập vào giới tính của trẻ");
+		String gioiTinh = sc.nextLine();
+		while (gioiTinh.trim().isEmpty() || (!gioiTinh.equalsIgnoreCase("Nam") && !gioiTinh.equalsIgnoreCase("Nữ"))) { // equalsIgnoreCase:
+																														// so
+																														// sánh
+																														// bỏ
+																														// qua
+																														// kiểu
+																														// chữ
+			System.out.println("Giới tính không hợp lệ, vui lòng nhập lại");
+			gioiTinh = sc.nextLine();
+		}
+		return gioiTinh;
+	}
+
+	public int nhapMaPH(Scanner sc) {
+		int maPH = 0;
+		boolean pH = false;
+		while (!pH) {
+			System.out.println("Nhập vào mã phụ huynh");
+			String input = sc.nextLine();
+			if (input.matches("\\d+")) {
+				maPH = Integer.parseInt(input);
+				try {
+					if (kiemTraMaPHTonTai(maPH)) {
+						pH = true;
+					} else {
+						System.out.println("Mã phụ huynh không tồn tại");
+					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Mã phụ huynh không hợp lệ");
+			}
+		}
+		return maPH;
+	}
+	
+	public boolean kiemTraMaPHTonTai(int monHocID) throws SQLException {
+		Connection con = ketNoi.getConnection();
+		String sql = "SELECT * FROM PHUHUYNH WHERE MaPH = ?";
+		PreparedStatement pst = con.prepareStatement(sql);
+		pst.setInt(1, monHocID);
+		ResultSet rs = pst.executeQuery();
+		return rs.next();
+	}
 }

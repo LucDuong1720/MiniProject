@@ -1,15 +1,18 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Scanner;
 
 import connectDB.ConnectDB;
 import connectDB.DatabaseManager;
+import connectDB.ketNoi;
 import controller.PhuHuynhController;
 import utility.InputValidator;
 
@@ -281,6 +284,72 @@ public class ShowDAO {
 			}
 		}
 
+	}
+
+	public void xemTreEm() {
+		try {
+			Connection con = ketNoi.getConnection();
+			String sql = "SELECT * FROM TREEM";
+			PreparedStatement pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			System.out.printf("%-10s %-20s %-20s %-15s %-10s\n", "Mã Trẻ", "Họ Tên Trẻ", "Ngày Sinh", " Giới Tính",
+					"Mã Phụ Huynh");
+			while (rs.next()) {
+				int MaTre = rs.getInt("MaTre");
+				String HoTenTre = rs.getString("HoTenTre");
+				Date NgaySinh = rs.getDate("NgaySinh");
+				String GioiTinh = rs.getString("GioiTinh");
+				int MaPH = rs.getInt("MaPH");
+				System.out.printf("%-10d %-20s %-20s %-15s %-10d\n", MaTre, HoTenTre,
+						new SimpleDateFormat("yyyy-MM-dd").format(NgaySinh), GioiTinh, MaPH);
+			}
+			System.out.println(sql);
+			ketNoi.closeConnection(con);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Xem thông tin trẻ em không thành công: " + e.getMessage());
+		}
+	}
+
+	public static void lietKeGiaoVien() {
+		try {
+			Connection con = ketNoi.getConnection();
+			String sql = "SELECT gv.MaGV, gv.HoTenGV, COUNT(lh.MaLH) AS SoLuongLop\n"
+					+ "FROM GIAOVIEN gv JOIN LOPHOC lh ON gv.MaGV = lh.MaGV\n"
+					+ "WHERE lh.NgayKhaiGiang BETWEEN '2024-01-01' AND '2024-02-28'\n"
+					+ "GROUP BY gv.MaGV, gv.HoTenGV\n" + "ORDER BY COUNT(lh.MaLH) DESC";
+			PreparedStatement pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			System.out.println("Thông tin các giáo viên dạy nhiều lớp học nhất trong khoảng thời gian 1/2024 - 2/2024");
+			System.out.printf("%-10s %-20s\n", "Mã Giáo Viên", "Tên Giáo Viên");
+			while (rs.next()) {
+				int MaGV = rs.getInt("MaGV");
+				String HoTenGV = rs.getString("HoTenGV");
+				System.out.printf("%-10d %-20s \n", MaGV, HoTenGV);
+			}
+			ketNoi.closeConnection(con);
+		} catch (SQLException e) {
+			System.out.println("Liệt kê thông tin giáo viên không thành công: " + e.getMessage());
+		}
+	}
+
+	public static boolean kiemTraMa(String tenBang, String tenCot, String maBang) {
+		boolean kiemTra = false;
+		try {
+			Connection con = ketNoi.getConnection();
+			String sql = "SELECT * FROM " + tenBang + " WHERE " + tenCot + " = ?";
+			PreparedStatement pst = con.prepareStatement(sql);
+			pst.setString(1, maBang);
+			ResultSet rs = pst.executeQuery();
+			if (rs.next()) {
+				kiemTra = true;
+			}
+			ketNoi.closeConnection(con);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return kiemTra;
 	}
 
 }

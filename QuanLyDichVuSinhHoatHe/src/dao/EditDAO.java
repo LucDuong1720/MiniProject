@@ -5,10 +5,13 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Scanner;
 
 import connectDB.ConnectDB;
 import connectDB.DatabaseManager;
+import connectDB.ketNoi;
 import utility.InputUtil;
 import utility.InputUtils;
 import utility.InputValidator;
@@ -328,6 +331,67 @@ public class EditDAO {
 			} catch (SQLException ex) {
 				System.out.println("Đống kết nối thất bại");
 			}
+		}
+	}
+
+	public void suaTreEm(Scanner sc2) {
+		try {
+			Connection con = ketNoi.getConnection();
+			int maSua = 0;
+			boolean kt = false;
+			while (!kt) {
+				System.out.println("Nhập vào mã của trẻ cần sửa");
+				maSua = Integer.parseInt(sc.nextLine());
+				if (check.isExists("TREEM", "MaTre", String.valueOf(maSua)) == true) {
+					kt = true;
+				} else {
+					System.out.println("Không tìm thấy mã trẻ!");
+				}
+			}
+			System.out.println("Nhập vào họ tên của trẻ");
+			String tenSua = check.nhapHoTenTre(sc);
+			java.sql.Date ngaySinhSua = null;
+			boolean ns = true;
+			while (ns) {
+				try {
+					System.out.println("Nhập vào ngày sinh của trẻ (YYYY-MM-DD)");
+					String NgaySinhSuaStr = sc.nextLine();
+					ngaySinhSua = java.sql.Date.valueOf(NgaySinhSuaStr);
+					LocalDate ngaySinhLocalDate = ngaySinhSua.toLocalDate(); // chuyển đối tượng java.sql.date sang
+																				// local date để so sánh với ngày hiện
+																				// tại
+					LocalDate ngayHienTai = LocalDate.now();
+					int tuoi = Period.between(ngaySinhLocalDate, ngayHienTai).getYears(); // phương thức period.between:
+																							// tính toán khoảng thời
+																							// gian giữa 2 đối tượng,
+																							// .getYears để lấy năm tính
+																							// tuổi
+					if (tuoi <= 5 || tuoi >= 15) {
+						System.out.println("Tuổi của trẻ không hợp lệ, phải lớn hơn 5 và nhỏ hơn 15");
+						continue;
+					}
+					ns = false;
+				} catch (Exception e) {
+					System.out.println("Ngày tháng năm không hợp lệ, vui lòng nhập lại");
+				}
+			}
+			
+			String gioiTinhSua = check.nhapGioiTinh(sc);
+			int maPHSua = check.nhapMaPH(sc);
+			String sql = "UPDATE TREEM SET HoTenTre = ?, NgaySinh = ?, GioiTinh = ?, MaPH = ? WHERE MaTre = ?";
+			PreparedStatement pst = con.prepareStatement(sql);
+			pst.setString(1, tenSua);
+			pst.setDate(2, ngaySinhSua);
+			pst.setString(3, gioiTinhSua);
+			pst.setInt(4, maPHSua);
+			pst.setInt(5, maSua);
+			pst.executeUpdate();
+			System.out.println("Đã sửa thông tin trẻ em thành công");
+			System.out.println(sql);
+			ketNoi.closeConnection(con);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Sửa thông tin trẻ em không thành công: " + e.getMessage());
 		}
 	}
 		

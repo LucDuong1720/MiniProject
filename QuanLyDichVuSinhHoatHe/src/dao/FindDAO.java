@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 import connectDB.ConnectDB;
 import connectDB.DatabaseManager;
+import connectDB.ketNoi;
 
 public class FindDAO {
 	Connection conn = DatabaseManager.getConnectDB();
@@ -196,6 +197,28 @@ public class FindDAO {
 			} catch (SQLException ex) {
 				System.out.println("Đống kết nối thất bại");
 			}
+		}
+	}
+
+	public void lietKeGiaoVien() {
+		try {
+			Connection con = ketNoi.getConnection();
+			String sql = "SELECT gv.MaGV, gv.HoTenGV, COUNT(lh.MaLH) AS SoLuongLop\n"
+					+ "FROM GIAOVIEN gv JOIN LOPHOC lh ON gv.MaGV = lh.MaGV\n"
+					+ "WHERE lh.NgayKhaiGiang BETWEEN '2024-01-01' AND '2024-02-28'\n"
+					+ "GROUP BY gv.MaGV, gv.HoTenGV\n" + "ORDER BY COUNT(lh.MaLH) DESC";
+			PreparedStatement pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			System.out.println("Thông tin các giáo viên dạy nhiều lớp học nhất trong khoảng thời gian 1/2024 - 2/2024");
+			System.out.printf("%-10s %-20s\n", "Mã Giáo Viên", "Tên Giáo Viên");
+			while (rs.next()) {
+				int MaGV = rs.getInt("MaGV");
+				String HoTenGV = rs.getString("HoTenGV");
+				System.out.printf("%-10d %-20s \n", MaGV, HoTenGV);
+			}
+			ketNoi.closeConnection(con);
+		} catch (SQLException e) {
+			System.out.println("Liệt kê thông tin giáo viên không thành công: " + e.getMessage());
 		}
 	}
 }
