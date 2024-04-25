@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
@@ -67,13 +68,16 @@ public class AddDAO {
 	
 			pst = con.prepareStatement(sql);
 			pst.setString(1, name);
-	
+			ResultSet rs = pst.executeQuery();
+			
+			
 	
 			int check = pst.executeUpdate();
 			if (check > 0) System.out.println("Thêm dữ liệu thành công");
 			else System.out.println("Thêm dữ liệu thất bại	");
 			} catch (SQLException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
+				System.out.println("Dữ liệu đã tồn tại");
 			} finally {
 				try {
 					con.close();
