@@ -10,6 +10,7 @@ import java.util.Scanner;
 import connectDB.ConnectDB;
 import connectDB.DatabaseManager;
 import connectDB.ketNoi;
+import utility.validate;
 
 public class FindDAO {
 	Connection conn = DatabaseManager.getConnectDB();
@@ -86,52 +87,50 @@ public class FindDAO {
         System.out.println("+-----------+---------------+-------------------+");
     }
 
-	public void timKiem(Scanner sc) {
-		System.out.println(" nhập họ tên phụ huynh cần tìm kiếm ");
-		String hoTen = sc.nextLine();
-		System.out.println("\n===========Danh sách tìm kiếm phụ huynh===========");
-		System.out.println(
-				"+---------+-------------------+---------------------+-------------------------+----------------------------+");
-		System.out.println(
-				"|   MaPH  |      HoTenPH      |        DiaChi       |           SoDT          |            Email           |");
-		System.out.println(
-				"+---------+-------------------+---------------------+-------------------------+----------------------------+");
+	public static void timKiem(Scanner sc) {
+        String hoTen = null;
+        boolean isValid;
+        do {
+            System.out.println("Họ và tên phụ huynh:");
+            hoTen = sc.nextLine();
+            isValid = validate.isValidHoTenPH(hoTen);
+            if (!isValid) {
+                System.out.println("Họ tên phụ huynh không hợp lệ. Vui lòng nhập lại.");
+            }
+        } while (!isValid);
+        try {
+            Connection con = connectDB.conn.getconnectDB();
+            String sql = "SELECT * FROM PHUHUYNH WHERE HoTenPH Like ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, "%" + hoTen + "%");
+            ResultSet rs = pst.executeQuery();
+            PreparedStatement pst1 = con.prepareStatement(sql);
+            pst1.setString(1, "%" + hoTen + "%");
+            ResultSet rs1 = pst1.executeQuery();
+            if(rs1.next()) {
+                System.out.println("\n===========Danh sách tìm kiếm phụ huynh===========");
+                System.out.println("+---------+-------------------+---------------------+-------------------------+----------------------------+");
+                System.out.println("|   MaPH  |      HoTenPH      |        DiaChi       |           SoDT          |            Email           |");
+                System.out.println("+---------+-------------------+---------------------+-------------------------+----------------------------+");
+                while (rs.next()) {
+                    int maPH = rs.getInt("MaPH");
+                    String tenPH = rs.getString("HoTenPH");
+                    String diaChi = rs.getString("DiaChi");
+                    String soDT = rs.getString("SoDT");
+                    String email = rs.getString("Email");
+                    System.out.printf("| %-7s | %-17s | %-19s | %-23s | %-26s |\n", maPH, tenPH, diaChi, soDT, email);
+                }
+                System.out.println("+---------+-------------------+---------------------+-------------------------+----------------------------+");
 
-		try {
-			Connection con = connectDB.conn.getconnectDB();
-
-			String sql = "SELECT * FROM PHUHUYNH WHERE HoTenPH Like ?";
-			PreparedStatement pst = con.prepareStatement(sql);
-			pst.setString(1, "%" + hoTen + "%");
-
-			ResultSet rs = pst.executeQuery();
-
-			int count = 0;
-			while (rs.next()) {
-				int maPH = rs.getInt("MaPH");
-				String tenPH = rs.getString("HoTenPH");
-				String diaChi = rs.getString("DiaChi");
-				String soDT = rs.getString("SoDT");
-				String email = rs.getString("Email");
-				count++;
-				System.out.printf("| %-7s | %-17s | %-19s | %-23s | %-26s |\n", maPH, tenPH, diaChi, soDT, email);
-
-			}
-			if (count == 0) {
-				System.out.println(" không có dữ  liệu về " + hoTen);
-			}
-
-			con.close();
-		} catch (SQLException e) {
-			e.getStackTrace();
-			System.out.println(" lỗi " + e.getMessage());
-
-		}
-		System.out.println(
-				"+---------+-------------------+---------------------+-------------------------+----------------------------+");
-
-	}
-
+            }else {
+                System.out.println("Dữ liệu không có tên "+ hoTen);
+            }
+            con.close();
+        } catch (SQLException e) {
+            System.out.println(" lỗi " + e.getMessage());
+        }
+    }
+	
 	public void top3() {
 		System.out.println("\n===========Tim kiếm top 3 phụ huynh đăng ký===========");
 		System.out.println("+---------+-------------------+----------------+---------+");

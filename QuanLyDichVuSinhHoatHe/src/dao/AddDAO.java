@@ -309,6 +309,30 @@ public class AddDAO {
 		} catch (SQLException e) {
 			System.out.println("Thêm thông tin trẻ em không thành công: " + e.getMessage());
 		}
-	}	
+	}
+
+	public void themThoiGianHoc() {
+		ConnectDB conn = new ConnectDB();
+		Connection con = conn.getConnectDB();
+		PreparedStatement pst = null;
+		Scanner sc = new Scanner(System.in);
+		System.out.println("\n==========Thêm thời gian học==========");
+        try {
+            System.out.println("Nhập ngày học: ");
+            String NgayHoc = InputValidator.getValidNgayHoc(sc);
+            System.out.println("Nhập giờ học: ");
+            String GioHoc = InputValidator.getValidGioHoc(sc);
+
+            String sql = "INSERT INTO THOIGIANHOC (NgayHoc,GioHoc) VALUES (?,?)";
+            pst = con.prepareStatement(sql);
+            pst.setString(1, NgayHoc);
+            pst.setString(2, GioHoc);
+            pst.executeUpdate();
+            System.out.println("thêm thời gian học thành công");
+            con.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }	
 }
 

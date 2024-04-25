@@ -17,7 +17,7 @@ import utility.InputUtils;
 import utility.InputValidator;
 
 public class EditDAO {
-	InputUtils check = new InputUtils();
+	static InputUtils check = new InputUtils();
 	static InputValidator validate = new InputValidator();
 	Connection conn = DatabaseManager.getConnectDB();
 	Scanner sc = new Scanner(System.in);
@@ -182,89 +182,88 @@ public class EditDAO {
         }while (!isValidInput);
     }
 
-	public static void update() {
+	public static void suaPhuHuynh() {
 		Scanner sc = new Scanner(System.in);
-		System.out.println(" nhập mã cần sửa ");
-		int maPH = 0;
-		boolean t = true;
-		while (t) {
-			maPH = Integer.parseInt(sc.nextLine());
-			try {
-				if (check(maPH)) {
-					t = false;
-				} else {
-					System.out.println(" nhập  lại mã cần sửa ");
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		String hoTenPH = null;
-		boolean isValid;
+		 int maPH = 0;
+	        boolean kt = false;
+	        while (!kt) {
+	            System.out.println("Nhập vào mã của phụ huynh cần sửa");
+	            String input = sc.nextLine();
+	            if (input != null && !input.trim().isEmpty() && input.matches("\\d+")) {
+	                maPH = Integer.parseInt(input);
+	                if (check.kiemTraMa("PHUHUYNH", "MaPH", String.valueOf(maPH)) == true) {
+	                    kt = true;
+	                } else {
+	                    System.out.println("Không tìm thấy mã phụ huynh!");
+	                }
+	            } else {
+	                System.out.println("Mã phụ huynh không hợp lệ, vui lòng nhập lại");
+	            }
+	        }
+        String hoTenPH = null;
+        boolean isValid;
 
-		do {
-			System.out.println("Họ và tên phụ huynh:");
-			hoTenPH = sc.nextLine();
-			isValid = validate.isValidHoTenPH(hoTenPH);
 
-			if (!isValid) {
-				System.out.println("Họ tên phụ huynh không hợp lệ. Vui lòng nhập lại.");
-			}
-		} while (!isValid);
+        do {
+            System.out.println("Họ và tên phụ huynh:");
+            hoTenPH = sc.nextLine();
+            isValid = validate.isValidHoTenPH(hoTenPH);
+            if (!isValid) {
+                System.out.println("Họ tên phụ huynh không hợp lệ. Vui lòng nhập lại.");
+            }
+        } while (!isValid);
 
-		String diaChi = null;
+        String diaChi = null;
 
-		do {
-			System.out.println(" Địa chỉ");
-			diaChi = sc.nextLine();
-			isValid = validate.isValidDiaChi(diaChi);
+        do {
+            System.out.println(" Địa chỉ");
+            diaChi = sc.nextLine();
+            isValid = validate.isValidDiaChi(diaChi);
 
-			if (!isValid) {
-				System.out.println("Địa chỉ không hợp lệ. Vui lòng nhập lại.");
-			}
-		} while (!isValid);
-		String soDT = null;
-		do {
-			System.out.println("Số điện thoại");
-			soDT = sc.nextLine();
-			isValid = validate.isValidSDT(soDT);
+            if (!isValid) {
+                System.out.println("Địa chỉ không hợp lệ. Vui lòng nhập lại.");
+            }
+        } while (!isValid);
+        String soDT = null;
+        do {
+            System.out.println("Số điện thoại");
+            soDT = sc.nextLine();
+            isValid = validate.isValidSDT(soDT);
 
-			if (!isValid) {
-				System.out.println("Số điện thoại không hợp lệ. Vui lòng nhập lại.");
-			}
-		} while (!isValid);
+            if (!isValid) {
+                System.out.println("Số điện thoại không hợp lệ. Vui lòng nhập lại.");
+            }
+        } while (!isValid);
 
-		String email = null;
-		do {
-			System.out.println("Nhập địa chỉ email:");
-			email = sc.nextLine();
-			isValid = validate.isValidEmail(email);
+        String email = null;
+        do {
+            System.out.println("Nhập địa chỉ email:");
+            email = sc.nextLine();
+            isValid = InputUtils.isValidEmail(email);
 
-			if (!isValid) {
-				System.out.println("Email không hợp lệ. Vui lòng nhập lại.");
-			}
-		} while (!isValid);
+            if (!isValid) {
+                System.out.println("Email không hợp lệ. Vui lòng nhập lại.");
+            }
+        } while (!isValid);
 
-		try {
-			Connection con = connectDB.conn.getconnectDB();
+        try {
+        	Connection con = connectDB.conn.getconnectDB();
+            String sql = "UPDATE  PHUHUYNH SET HoTenPH = ?,DiaChi = ?,SoDT =?,Email = ? WHERE MaPH=?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, hoTenPH);
+            pst.setString(2, diaChi);
+            pst.setString(3, soDT);
+            pst.setString(4, email);
+            pst.setInt(5, maPH);
+            int a = pst.executeUpdate();
+            System.out.println(a + " phụ huynh đã được sửa vào thành công ");
 
-			String sql = "UPDATE  PHUHUYNH SET HoTenPH = ?,DiaChi = ?,SoDT =?,Email = ? WHERE MaPH=?";
-			PreparedStatement pst = con.prepareStatement(sql);
-			pst.setString(1, hoTenPH);
-			pst.setString(2, diaChi);
-			pst.setString(3, soDT);
-			pst.setString(4, email);
-			pst.setInt(5, maPH);
-			int a = pst.executeUpdate();
-			System.out.println(a + " phụ huynh đã được sửa vào thành công ");
+            con.close();
+        } catch (SQLException e) {
+            System.out.println(" lỗi " + e.getMessage());
+        }
 
-			con.close();
-		} catch (SQLException e) {
-			System.out.println(" lỗi " + e.getMessage());
-		}
-
-	}
+    }
 		
 	public static boolean check(int maPH) throws SQLException {
 		boolean ct = false;
@@ -337,18 +336,10 @@ public class EditDAO {
 	public void suaTreEm(Scanner sc2) {
 		try {
 			Connection con = ketNoi.getConnection();
-			int maSua = 0;
-			boolean kt = false;
-			while (!kt) {
-				System.out.println("Nhập vào mã của trẻ cần sửa");
-				maSua = Integer.parseInt(sc.nextLine());
-				if (check.isExists("TREEM", "MaTre", String.valueOf(maSua)) == true) {
-					kt = true;
-				} else {
-					System.out.println("Không tìm thấy mã trẻ!");
-				}
-			}
-			System.out.println("Nhập vào họ tên của trẻ");
+			
+			int maSua = nhapMaTre(sc);
+			
+//			System.out.println("Nhập vào họ tên của trẻ");
 			String tenSua = check.nhapHoTenTre(sc);
 			java.sql.Date ngaySinhSua = check.nhapNgaySinh(sc);
 			String gioiTinhSua = check.nhapGioiTinh(sc);
@@ -369,5 +360,64 @@ public class EditDAO {
 			System.out.println("Sửa thông tin trẻ em không thành công: " + e.getMessage());
 		}
 	}
+	public int nhapMaTre (Scanner sc) {
+        int maTre = 0;
+        boolean kt = false;
+        while (!kt) {
+            System.out.println("Nhập vào mã của trẻ cần sửa");
+            String input = sc.nextLine();
+             if (input != null && !input.trim().isEmpty() && input.matches("\\d+")) {
+                    maTre = Integer.parseInt(input);
+            if (check.kiemTraMa("TREEM", "MaTre", String.valueOf(maTre)) == true) {
+                kt = true;
+            } else {
+                System.out.println("Không tìm thấy mã trẻ!");
+            }
+             } else {
+                 System.out.println("Mã trẻ không hợp lệ, vui lòng nhập lại");
+             }
+        }
+        return maTre;
+    }
+
+
+	public void suaThoiGianHoc() {
+		ConnectDB conn = new ConnectDB();
+		Connection con = conn.getConnectDB();
+		PreparedStatement pst = null;
+		System.out.println("\n=========Sửa thời gian học=========");
+        boolean isValidInput = false;
+        do {
+            try {
+//                con = ConnectDB.getConnectDB();
+                System.out.println("Nhâp mã thời gian học cần sửa");
+                int MaTGH = Integer.parseInt(sc.nextLine());
+                if (!InputValidator.validateMa(MaTGH)) {
+                    System.out.println("mã đăng ký không hợp lệ");
+                    continue;
+                }
+                if (!InputValidator.kiemTraMaTGH(MaTGH)) {
+                    System.out.println("Mã đăng ký không tồn tại. Vui lòng nhập lại.");
+                    continue;
+                }
+                System.out.println("Nhập ngày học mới: ");
+                String NgayHoc = InputValidator.getValidNgayHoc(sc);
+                System.out.println("Nhập giờ học mới: ");
+                String GioHoc = InputValidator.getValidGioHoc(sc);
+
+                String sql = "UPDATE THOIGIANHOC SET NgayHoc=? , GioHoc=? WHERE MaTGH=?";
+                pst = con.prepareStatement(sql);
+                pst.setString(1,NgayHoc);
+                pst.setString(2,GioHoc);
+                pst.setInt(3,MaTGH);
+                pst.executeUpdate();
+                System.out.println("Đã sửa thành công");
+                con.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            isValidInput = true;
+        }while (!isValidInput);
+    }
 		
 }

@@ -5,24 +5,27 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import connectDB.ConnectDB;
 import connectDB.DatabaseManager;
 
 public class InputValidator {
 	static Connection conn = DatabaseManager.getConnectDB();
-    public static boolean validateMa(int ma){
-        return ma > 0;
-    }
-    public static boolean validateDate(String dateStr){
-        try {
-            Date.valueOf(dateStr);
-            return true;
-        }
-        catch (IllegalArgumentException e){
-            return false;
-        }
-    }
+	    public static boolean validateMa(int ma){
+	        return ma > 0;
+	    }
+	    public static boolean validateDate(String dateStr){
+	    	
+	        try {
+	            Date.valueOf(dateStr);
+	            return true;
+	        }
+	        catch (IllegalArgumentException e){
+	            return false;
+	        }
+	    }
     public static boolean validateTrangThai(String TrangThai){
         return TrangThai.equalsIgnoreCase("Đã duyệt") || TrangThai.equalsIgnoreCase("Chưa duyệt");
     }
@@ -61,7 +64,7 @@ public class InputValidator {
     
     public boolean isValidHoTenPH(String hoTenPH) {
 	    // Kiểm tra nếu chuỗi không rỗng và không null
-			 if (hoTenPH == null || hoTenPH.isEmpty()) {
+			 if (hoTenPH == null || hoTenPH.trim().isEmpty()) {
 		            return false;
 		        }
 
@@ -72,7 +75,7 @@ public class InputValidator {
 		    }
 
 		public boolean isValidDiaChi(String diaChi) {
-			if (diaChi == null || diaChi.isEmpty()) {
+			if (diaChi == null || diaChi.trim().isEmpty()) {
 	            return false;
 	        }
 
@@ -82,7 +85,7 @@ public class InputValidator {
 	        return Pattern.matches(regex, diaChi);
 	    }
 		 public boolean isValidSDT(String sdt) {
-			 if (sdt == null || sdt.isEmpty()) {
+			 if (sdt == null || sdt.trim().isEmpty()) {
 		            return false;
 		        }
 		 
@@ -99,4 +102,36 @@ public class InputValidator {
 		        // Kiểm tra địa chỉ email bằng biểu thức chính quy
 		        return email.matches(regex);
 		        }
+		public static boolean kiemTraMaTGH(int maTGH) throws SQLException {
+			ConnectDB conn = new ConnectDB();
+			Connection con = conn.getConnectDB();
+			PreparedStatement pst = null;
+			String sql = "SELECT 1 FROM THOIGIANHOC WHERE MaTGH = ?";
+	        pst = con.prepareStatement(sql);
+	        pst.setInt(1, maTGH);
+	        ResultSet rs = pst.executeQuery();
+	        return rs.next();
+	    }
+		public static String getValidNgayHoc(Scanner sc) {
+			String GioHoc = "";
+	        while (GioHoc.trim().isEmpty()) {
+	            System.out.println("Nhập giờ học: ");
+	            GioHoc = sc.nextLine();
+	            if (GioHoc.trim().isEmpty()) {
+	                System.out.println("Không được để trống.");
+	            }
+	        }
+	        return GioHoc;
+	    }
+		public static String getValidGioHoc(Scanner sc) {
+			String NgayHoc = "";
+	        while (NgayHoc.trim().isEmpty()) {
+	            System.out.println("Nhập ngày học: ");
+	            NgayHoc = sc.nextLine();
+	            if (NgayHoc.trim().isEmpty()) {
+	                System.out.println("Không được để trống.");
+	            }
+	        }
+	        return NgayHoc;
+		}
 }

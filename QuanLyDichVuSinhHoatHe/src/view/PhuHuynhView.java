@@ -38,6 +38,7 @@ public class PhuHuynhView {
         List<String> ketQuaTimKiem = phuHuynhController.timKiemLopHocTheoTenMH(tenMH);
         if (ketQuaTimKiem.isEmpty()) {
             System.out.println("Không tìm thấy lớp học nào với tên môn học: " + tenMH);
+            timKiemLopHocTheoTenMH();
         } else {
             System.out.println("Kết quả tìm kiếm cho '" + tenMH + "':");
             hienThiBangDanhSachLopHoc(ketQuaTimKiem);

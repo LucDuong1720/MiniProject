@@ -181,61 +181,30 @@ public class ShowDAO {
 	}
 
 	public void hienThiToanBoThongTin() {
-		System.out.println("\n==========Hiển thị toàn bộ thông tin============");
-        boolean isValidInput = false;
-        do {
-            try {
-                System.out.println("Nhập MaDK cần tìm: ");
-                int MaDK = Integer.parseInt(sc.nextLine());
-                if (!InputValidator.validateMa(MaDK)) {
-                    System.out.println("mã đăng ký không hợp lệ");
-                    continue;
-                }
-                if (!check.kiemTraMaDKTonTai(MaDK)) {
-                    System.out.println("Mã đăng ký không tồn tại. Vui lòng nhập lại.");
-                    continue;
-                }
-                System.out.println("+----------+----------+------------------+---------------------+-------------------------+--------------------------+----------+------------------+----------------+----------+----------+--------------+-----------+-------------------+------------+--------------+--------------+");
-                System.out.println("|   MaDK   |   MaPH   |     HoTenPH      |        DiaChi       |          SoDT           |            Email         |  MaTre   |     HoTenTre     |     NgaySinh   | GioiTinh |  MaLH    |   PhongHoc   |   SoBuoi  |    NgayKhaiGiang  |   HocPhi   |  NgayDangKy  |   TrangThai  |");
-                System.out.println("+----------+----------+------------------+---------------------+-------------------------+--------------------------+----------+------------------+----------------+----------+----------+--------------+-----------+-------------------+------------+--------------+--------------+");
+	    System.out.println("\n==========Hiển thị toàn bộ thông tin============");
+	    try {
+	        System.out.println("+----------+----------+----------+----------+----------------+--------------+");
+	        System.out.println("|   MaDK   |   MaPH   |  MaTre   |  MaLH    |    NgayDangKy  |   TrangThai  |");
+	        System.out.println("+----------+----------+----------+----------+----------------+--------------+");
 
+	        String sql = "SELECT * FROM DANGKYTRE";
+	        PreparedStatement pst = conn.prepareStatement(sql);
+	        ResultSet rs = pst.executeQuery();
+	        while (rs.next()) {
+	            System.out.printf("| %-8s | %-8s | %-8s | %-8s | %-14s | %-12s |\n",
+	                    rs.getInt("MaDK"),
+	                    rs.getInt("MaPH"),
+	                    rs.getInt("MaTre"),
+	                    rs.getInt("MaLH"),
+	                    rs.getDate("NgayDangKy"),
+	                    rs.getString("TrangThai"));
+	        }
+	        System.out.println("+----------+----------+----------+----------+----------------+--------------+");
+	    } catch (SQLException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
 
-                String sql = "SELECT DK.MaDK, PH.MaPH, PH.HoTenPH, PH.DiaChi, PH.SoDT, PH.Email, T.MaTre, T.HoTenTre, T.NgaySinh, T.GioiTinh, LH.MaLH, LH.PhongHoc, LH.SoBuoi, LH.NgayKhaiGiang, LH.HocPhi, DK.NgayDangKy, DK.TrangThai\n" +
-                        "FROM DANGKYTRE DK\n" +
-                        "JOIN PHUHUYNH PH ON DK.MaPH = PH.MaPH\n" +
-                        "JOIN TREEM T ON DK.MaTre = T.MaTre\n" +
-                        "JOIN LOPHOC LH ON DK.MaLH = LH.MaLH\n" +
-                        "WHERE DK.MaDK=?";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.setInt(1, MaDK);
-                ResultSet rs = pst.executeQuery();
-                if (rs.next()){
-                    System.out.printf("| %-8s | %-8s | %-16s | %-19s | %-23s | %-23s | %-8s | %-16s | %-14s | %-8s | %-8s | %-12s | %-9s | %-17s | %-10s | %-12s | %-12s |\n",
-                        rs.getInt("MaDK"),
-                        rs.getInt("MaPH"),
-                        rs.getString("HoTenPH"),
-                        rs.getString("DiaChi"),
-                        rs.getString("SoDT"),
-                        rs.getString("Email"),
-                        rs.getInt("MaTre"),
-                        rs.getString("HoTenTre"),
-                        rs.getDate("NgaySinh"),
-                        rs.getString("GioiTinh"),
-                        rs.getInt("MaLH"),
-                        rs.getString("PhongHoc"),
-                        rs.getInt("SoBuoi"),
-                        rs.getDate("NgayKhaiGiang"),
-                        rs.getDouble("HocPhi"),
-                        rs.getDate("NgayDangKy"),
-                        rs.getString("TrangThai"));
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            isValidInput = true;
-        }while (!isValidInput);
-        System.out.println("+----------+----------+------------------+---------------------+-------------------------+--------------------------+----------+------------------+----------------+----------+----------+--------------+-----------+-------------------+------------+--------------+--------------+");
-    }
 
 	public void hienThiThongTinLop() {
 		String sql = "SELECT MaLH, TenMH, HoTenGV, NgayHoc, GioHoc, PhongHoc,SoBuoi,NgayKhaiGiang,HocPhi FROM LOPHOC as LH , MONHOC as MH, GIAOVIEN as GV, THOIGIANHOC as TGH Where MH.MaMH = LH.MaMH AND GV.MaGV = LH.MaGV AND TGH.MaTGH = LH.MaTGH";
@@ -352,5 +321,27 @@ public class ShowDAO {
 		}
 		return kiemTra;
 	}
+
+	public void hienThiTGHoc() {
+		ConnectDB conn = new ConnectDB();
+		Connection con = conn.getConnectDB();
+		PreparedStatement pst = null;
+		System.out.println("\n============Hiển thị thơi gian học============");
+	        try {
+	            String sql = "SELECT * FROM THOIGIANHOC";
+	            pst = con.prepareStatement(sql);
+	            ResultSet rs = pst.executeQuery();
+
+	            while (rs.next()){
+	                System.out.println("MaTGH: " + rs.getInt("MaTGH"));
+	                System.out.println("NgayHoc: " + rs.getString("NgayHoc"));
+	                System.out.println("GioHoc: " + rs.getString("GioHoc"));
+	            }
+	            rs.close();
+	            con.close();
+	        } catch (SQLException e) {
+	            throw new RuntimeException(e);
+	        }
+	    }
 
 }

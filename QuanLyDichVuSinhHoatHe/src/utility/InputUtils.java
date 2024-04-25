@@ -17,99 +17,123 @@ import connectDB.ConnectDB;
 import connectDB.ketNoi;
 
 public class InputUtils {
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\d{10}(?:,\\d{10})*$");
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$");
+	 private static final Scanner scanner = new Scanner(System.in);
+	    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\d{10}(?:,\\d{10})*$");
+	    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$");
 
 
-    public static String getStringInput(String message) {
-        while (true) {
-            try {
-                System.out.print(message);
-                String input = scanner.nextLine().trim(); // Xóa các khoảng trắng ở đầu và cuối chuỗi
-                if (input.isEmpty()) {
-                    throw new IllegalArgumentException("Dữ liệu không được rỗng.");
-                }
-                return checkNullInput(input, "Dữ liệu không được rỗng.");
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
+	    public static String getStringInput(String message) {
+	        while (true) {
+	            try {
+	                System.out.print(message);
+	                String input = scanner.nextLine().trim();
+	                if (input.isEmpty()) {
+	                    throw new IllegalArgumentException("Dữ liệu không được rỗng.");
+	                }
+	                if (!isValidInput(input)) {
+	                    throw new IllegalArgumentException("Dữ liệu không được chứa ký tự đặc biệt.");
+	                }
+	                return input;
+	            } catch (IllegalArgumentException e) {
+	                System.out.println(e.getMessage());
+	            }
+	        }
+	    }
 
-    public static <T> T checkNullInput(T input, String errorMessage) {
-        if (input == null) {
-            throw new IllegalArgumentException(errorMessage);
-        }
-        return input;
-    }
+	    public static <T> T checkNullInput(T input, String errorMessage) {
+	        if (input == null) {
+	            throw new IllegalArgumentException(errorMessage);
+	        }
+	        return input;
+	    }
 
-    public static int getIntInput(String message) {
-        while (true) {
-            try {
-                System.out.print(message);
-                return Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Vui lòng nhập một số nguyên.");
-            }
-        }
-    }
-
-
-    public static LocalDate getDateInput(String message) {
-        while (true) {
-            try {
-                System.out.print(message);
-                String input = scanner.nextLine();
-                String[] parts = input.split("/");
-
-                // Kiểm tra số lượng phần tử và giá trị hợp lệ của ngày, tháng và năm
-                if (parts.length != 3) {
-                    throw new DateTimeException("Định dạng ngày không hợp lệ. Vui lòng nhập lại.");
-                }
-
-                int day = Integer.parseInt(parts[0]);
-                int month = Integer.parseInt(parts[1]);
-                int year = Integer.parseInt(parts[2]);
-
-                if (year < 1 || year > 9999 || month < 1 || month > 12 || day < 1 || day > LocalDate.of(year, month, 1).lengthOfMonth()) {
-                    throw new DateTimeException("Ngày tháng không hợp lệ. Vui lòng nhập lại.");
-                }
-
-                // Parse thành LocalDate nếu tất cả các giá trị hợp lệ
-                return LocalDate.parse(input, DATE_FORMATTER);
-
-            } catch (DateTimeException | NumberFormatException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
+	    public static boolean isValidInput(String input) {
+	        // Kiểm tra xem chuỗi nhập vào có chứa ký tự đặc biệt hay không
+	        return !Pattern.compile("[^a-zA-Z0-9]").matcher(input).find();
+	    }
+	    public static String getInputWithoutSpecialCharacters(String message) {
+	        while (true) {
+	            try {
+	                System.out.print(message);
+	                String input = scanner.nextLine().trim();
+	                if (input.isEmpty()) {
+	                    throw new IllegalArgumentException("Dữ liệu không được rỗng.");
+	                }
+	                return input;
+	            } catch (IllegalArgumentException e) {
+	                System.out.println(e.getMessage());
+	            }
+	        }
+	    }
 
 
-    public static boolean getBooleanInput(String message) {
-        while (true) {
-            System.out.print(message + " (C/K): ");
-            String choice = scanner.nextLine().toUpperCase();
-            if (choice.equals("C")) {
-                return true;
-            } else if (choice.equals("K")) {
-                return false;
-            } else {
-                System.out.println("Vui lòng chỉ chọn 'C' hoặc 'K'.");
-            }
-        }
-    }
+	    public static int getIntInput(String message) {
+	        while (true) {
+	            try {
+	                System.out.print(message);
+	                return Integer.parseInt(scanner.nextLine());
+	            } catch (NumberFormatException e) {
+	                System.out.println("Vui lòng nhập một số nguyên.");
+	            }
+	        }
+	    }
 
-    public static boolean isValidPhoneNumber(String phoneNumber) {
-        Matcher matcher = PHONE_PATTERN.matcher(phoneNumber);
-        return matcher.matches();
-    }
 
-    public static boolean isValidEmail(String email) {
-        Matcher matcher = EMAIL_PATTERN.matcher(email);
-        return matcher.matches();
-    }
+	    public static LocalDate getDateInput(String message) {
+	        while (true) {
+	            try {
+	                System.out.print(message);
+	                String input = scanner.nextLine();
+	                String[] parts = input.split("/");
+
+	                // Kiểm tra số lượng phần tử và giá trị hợp lệ của ngày, tháng và năm
+	                if (parts.length != 3) {
+	                    throw new DateTimeException("Định dạng ngày không hợp lệ. Vui lòng nhập lại.");
+	                }
+
+	                int day = Integer.parseInt(parts[0]);
+	                int month = Integer.parseInt(parts[1]);
+	                int year = Integer.parseInt(parts[2]);
+
+	                if (year < 1 || year > 9999 || month < 1 || month > 12 || day < 1 || day > LocalDate.of(year, month, 1).lengthOfMonth()) {
+	                    throw new DateTimeException("Ngày tháng không hợp lệ. Vui lòng nhập lại.");
+	                }
+
+	                // Parse thành LocalDate nếu tất cả các giá trị hợp lệ
+	                return LocalDate.parse(input, DATE_FORMATTER);
+
+	            } catch (DateTimeException | NumberFormatException e) {
+	                System.out.println(e.getMessage());
+	            }
+	        }
+	    }
+
+
+	    public static boolean getBooleanInput(String message) {
+	        while (true) {
+	            System.out.print(message + " (C/K): ");
+	            String choice = scanner.nextLine().toUpperCase();
+	            if (choice.equals("C")) {
+	                return true;
+	            } else if (choice.equals("K")) {
+	                return false;
+	            } else {
+	                System.out.println("Vui lòng chỉ chọn 'C' hoặc 'K'.");
+	            }
+	        }
+	    }
+
+	    public static boolean isValidPhoneNumber(String phoneNumber) {
+	        Matcher matcher = PHONE_PATTERN.matcher(phoneNumber);
+	        return matcher.matches();
+	    }
+
+	    public static boolean isValidEmail(String email) {
+	        Matcher matcher = EMAIL_PATTERN.matcher(email);
+	        return matcher.matches();
+	    }
+
     
     public boolean containsNumber(String input) {
         for (char c : input.toCharArray()) {
@@ -313,4 +337,23 @@ public class InputUtils {
         }
         return luaChon;
     }
+
+	public boolean kiemTraMa(String tenBang, String tenCot, String maBang) {
+		boolean kiemTra = false;
+		try {
+			Connection con = ketNoi.getConnection();
+			String sql = "SELECT * FROM " + tenBang + " WHERE " + tenCot + " = ?";
+			PreparedStatement pst = con.prepareStatement(sql);
+			pst.setString(1, maBang);
+			ResultSet rs = pst.executeQuery();
+			if (rs.next()) {
+				kiemTra = true;
+			}
+			ketNoi.closeConnection(con);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return kiemTra;
+	}
 }

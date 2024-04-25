@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -343,27 +344,64 @@ public class InputUtil {
 
 	// Kiểm tra ngày khai giảng
 	public static String getCheckNgayKhaiGiang() {
-		String ngayKhaiGiangString = "";
-		boolean ns2 = true;
-		while (ns2) {
-			try {
-				System.out.println("Nhập ngày Khai giảng (mm-dd-yyyy): ");
-				SimpleDateFormat formatter = new SimpleDateFormat("mm-dd-yyyy");
-				ngayKhaiGiangString = sc.nextLine();
-				Date ngayKhaiGiang = new Date(ngayKhaiGiangString);
-				ns2 = false;
-				try {
-					Date date = formatter.parse(ngayKhaiGiangString);
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+           while (true) {
+               try {
+                   System.out.println("Nhập ngày Khai giảng (định dạng yyyy-MM-dd): ");
+                   String ngayKhaiGiangString = sc.nextLine();
 
-			} catch (Exception e) {
-				System.out.println("Vui lòng nhập lại ngày đúng định dạng mm-dd-yyyy");
-			}
-		}
-		return ngayKhaiGiangString;
-	}
 
+                   // Kiểm tra tính hợp lệ của ngày tháng trước khi phân tích cú pháp
+                   if (!isValidDate(ngayKhaiGiangString)) {
+                       System.out.println("Ngày không hợp lệ. Vui lòng nhập lại đúng định dạng.");
+                       continue; // Tiếp tục vòng lặp để yêu cầu nhập lại
+                   }
+
+
+                   Date ngayKhaiGiang = formatter.parse(ngayKhaiGiangString);
+                   return ngayKhaiGiangString;
+               } catch (ParseException e) {
+                   System.out.println("Ngày không hợp lệ. Vui lòng nhập lại đúng định dạng.");
+               }
+           }
+       }
+
+
+   // Kiểm tra ngày khai giang
+    public static boolean isValidDate(String ngayKhaiGiangString) {
+           try {
+               SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+               formatter.setLenient(false); // Không cho phép chấp nhận các ngày không hợp lệ (ví dụ: 02-30)
+
+
+               // Parse ngày từ chuỗi
+               Date ngayKhaiGiang = formatter.parse(ngayKhaiGiangString);
+
+
+               // Kiểm tra xem ngày có đúng không
+               return true;
+           } catch (ParseException e) {
+               return false; // Nếu có lỗi xảy ra trong quá trình kiểm tra, trả về false
+           }
+       }
+ 
+	 public static int getCheckMenu() {
+	        int choice = -1;
+	        boolean validInput = false;
+	        while (!validInput) {
+	            try {
+	                choice = Integer.parseInt(sc.nextLine());
+	                if (choice < 0 || choice > 5) {
+	                    throw new IllegalArgumentException("Lựa chọn không hợp lệ. Vui lòng nhập lại");
+	                }
+	                validInput = true;
+	            } catch (NumberFormatException e) {
+	                System.out.println("Lựa chọn không hợp lệ. Vui lòng nhập lại");
+	            } catch (IllegalArgumentException e) {
+	                System.out.println(e.getMessage());
+	            }
+	        }
+	        return choice;
+	    }
 }
 
